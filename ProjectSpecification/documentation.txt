@@ -1,0 +1,137 @@
+Welcome to console chess!
+A fast way to play chess with your friends directly into your terminal.
+
+To start a game, run main.py.
+
+Then, write your moves using standard fide notation (Kc3, e4, Bxe7, e8=Q, etc...)
+The game will detect legal moves, check for checks, mates, stalemates and repetition.
+If you need help, type help.
+
+
+Technical documentation:
+
+
+Design Pattern: Template Method
+
+The project implements the Template Method design pattern in the piece hierarchy.
+
+What is the Template Method Pattern?
+   The Template Method pattern defines the skeleton of an algorithm in a base class,
+   allowing subclasses to override specific steps without changing the overall structure.
+
+Implementation in this project:
+   - The Piece base class (pieces.py) defines:
+     * Abstract methods: symbol() and get_possible_moves() that subclasses must implement
+     * Common helper methods: _is_valid_square(), _can_move_to(), _can_capture_on()
+   
+   - Each piece subclass (Pawn, Rook, Knight, Bishop, Queen, King) provides its own
+     implementation of symbol() and get_possible_moves() with piece-specific movement rules.
+   
+   - The Board and Game classes interact with pieces through the base Piece interface,
+     calling get_possible_moves() without knowing the concrete piece type. Python's
+     polymorphism ensures the correct subclass method is invoked.
+
+Benefits:
+   - New piece types can be added by creating a new subclass without modifying Board or Game
+   - Common validation logic is centralized in the base class
+   - Each piece encapsulates its own movement rules, following the Single Responsibility Principle
+
+Example flow:
+   1. Game calls board.get_piece(row, col) - returns a Piece reference
+   2. Game calls piece.get_possible_moves(pos, board) - polymorphism calls the correct subclass method
+   3. Knight.get_possible_moves() uses inherited _can_move_to() helper to validate L-shaped moves
+   4. Board doesn't need to know it's dealing with a Knight specifically
+
+
+Class diagrams:
+
+                    Piece (base class)
+                      |
+                      | (inheritance)
+                      |
+    +------+------+-------+--------+-------+-------+---- etc... (easy to extend)
+    |      |      |       |        |       |       |
+  Pawn   Rook  Knight  Bishop   Queen   King     New Piece
+
+
+
+1. pieces.py
+   
+   Contains all chess piece classes with their movement logic.
+   
+   Classes:
+   - Piece (base class)
+     - __init__(color): Initialize with 'white' or 'black'
+     - symbol(): Returns display character (uppercase = white, lowercase = black)
+     - get_possible_moves(pos, board): Returns list of (row, col) tuples
+     - _is_valid_square(row, col): Check if coordinates are within board
+     - _can_move_to(row, col, board): Check if square is empty or has enemy piece
+     - _can_capture_on(row, col, board): Check if enemy piece exists on square
+   
+   Subclasses :
+   - Pawn, Rook, Knight, Bishop, Queen, King
+
+2. board.py
+   
+   Manages the 8x8 chess board state and piece interactions.
+   
+   Class: Board
+   - __init__(): Creates board with pieces in starting positions
+   - _setup_pieces(): Places all pieces for a new game
+   - get_piece(row, col): Returns piece at position or None
+   - set_piece(row, col, piece): Places piece at position
+   - move_piece(from_pos, to_pos, promotion_piece): Executes a move, handles en passant, castling, and pawn promotion. Returns captured piece.
+   - find_king(color): Returns (row, col) of the king
+   - is_square_attacked(row, col, by_color): Checks if square is under attack
+   - is_in_check(color): Returns True if the king is in check
+   - find_pieces(piece_type, color): Returns list of positions for matching pieces
+   - copy(): Creates a deep copy of the board for move validation
+   - display(): Prints the board to console with coordinates
+   
+   Attributes:
+   - squares: 8x8 list of pieces (None for empty squares)
+   - en_passant_target: (row, col) where en passant capture is possible, or None
+
+3. move_parser.py
+   
+   Parses algebraic notation and validates moves.
+   
+   Constants:
+   - PIECE_MAP: Maps piece letters (K, Q, R, B, N) to classes
+   
+   Functions:
+   - parse_square(square_str): Converts "e4" to (row, col) tuple
+   - square_to_algebraic(row, col): Converts (row, col) to "e4" format
+   - parse_move(move_str, color, board): Parses algebraic notation (e.g., "Nf3", "exd5", "O-O", "e8=Q") and returns move dict with 'from', 'to', 'promotion' keys, or None if invalid
+   - parse_castling(color, board, kingside): Handles castling notation
+   - is_valid_move(move, color, board): Tests if move leaves king in check
+   - get_move_notation(from_pos, to_pos, piece, board, is_capture, promotion): Generates proper algebraic notation with disambiguation
+
+4. game.py
+   
+   Main game logic and turn management.
+   
+   Class: Game
+   - __init__(): Creates new game with fresh board, white to move
+   - switch_turn(): Alternates between white and black
+   - make_move(move_str): Parses and executes a move. Returns (success, message)
+   - _check_game_state(): Detects check, checkmate, and stalemate
+   - _has_legal_moves(color): Returns True if player has any legal moves
+   - display(): Shows the current board
+   - get_status(): Returns current game status string
+   
+   Attributes:
+   - board: Board instance
+   - current_turn: 'white' or 'black'
+   - move_history: List of played moves
+   - game_over: Boolean
+   - winner: 'white', 'black', or None (draw)
+   
+   Function: play_game()
+   - Main game loop that handles user input
+   - Supported commands: quit, help
+   - Displays move notation guide at startup
+
+5. main.py
+   
+   Entry point for the application. Simply imports and calls play_game() from game.py.

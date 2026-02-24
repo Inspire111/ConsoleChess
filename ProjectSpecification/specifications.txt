@@ -1,0 +1,48 @@
+Project specification
+APRO1
+
+Please, prepare the project accordingly:
+
+A Project topic
+1) The project topic can be selected freely based on personal interests and previous 
+experience. 
+
+2) The project topic can be changed during the semester
+
+B Content
+1) The project should demonstrate the command of object-oriented programming 
+using concepts such as inheritance, polymorphism, encapsulation etc.
+2) The project should declare at least 10 specific classes
+3) The preferred programming languages are c# and JAVA but other 
+programming languages can also be used.
+4) The project should apply at least one selected design pattern.
+5) The project should ensure data persistence (File, DB, etc.) 
+6) The project should appropriately apply error handling using exceptions
+
+C Code
+1) The code should be well structured using appropriate programming techniques 
+2) The code should follow any relevant conventions based on the selected 
+programming language.
+3) The code should be readable using consistent naming rules
+4) The code should be appropriately commented where relevant
+
+D Technical documentation 
+1) The code should be accompanied with technical documentation 
+2) The documentation should include brief description of the project. 
+3) The documentation should include class diagram and other relevant diagrams 
+4) The documentation should include details of how the design pattern was 
+implemented
+5) Do not include generated documentation comments such as Javadoc
+
+E Use of AI
+1) You are welcome to use LLMs to generate specific parts of the code provided 
+you understand the generated part and the part is skilfully incorporated to the 
+rest of the code. 
+2) Do not use LLMs to generate the complete solution.
+3) You are welcome to use LLMs to generate parts of the technical 
+documentation
+
+F Structure of the project files
+1) Structure appropriately the project files into folders. 
+2) Submitt project files (source code and documentation) in one zip file
+3) Submit using mail based on instructions. 
