@@ -114,7 +114,7 @@ Class diagrams:
    Class: Game
    - __init__(): Creates new game with fresh board, white to move
    - switch_turn(): Alternates between white and black
-   - make_move(move_str): Parses and executes a move. Returns (success, message)
+   - make_move(move_str, raise_exceptions): Parses and executes a move. Returns (success, message). Can optionally raise exceptions.
    - _check_game_state(): Detects check, checkmate, and stalemate
    - _has_legal_moves(color): Returns True if player has any legal moves
    - display(): Shows the current board
@@ -129,9 +129,38 @@ Class diagrams:
    
    Function: play_game()
    - Main game loop that handles user input
-   - Supported commands: quit, help
+   - Supported commands: quit, help, fen <string>, savefen
    - Displays move notation guide at startup
 
-5. main.py
+5. game_loader.py
+   
+   Handles loading and saving chess positions using FEN notation.
+   
+   Class: GameLoader
+   - __init__(): Initialize the loader
+   - load_fen(fen_string): Load a game from FEN notation. Supports both full FEN and position-only strings. Raises InvalidFENError on malformed input.
+   - save_fen(game): Save the current game state to a FEN string
+   - _parse_position(position, original_fen): Parse board position from FEN
+   - _apply_castling_rights(board, castling_str, original_fen): Apply castling availability
+   - _mark_all_as_moved(board): Mark all pieces as moved (for loaded positions)
+   - _parse_square(square_str, original_fen): Parse algebraic square notation
+   - _piece_to_fen(piece): Convert piece to FEN character
+   - _get_castling_rights(board): Determine castling rights from board state
+   
+   Constants:
+   - PIECE_FROM_FEN: Maps FEN characters to (PieceClass, color) tuples
+
+6. exceptions.py
+   
+   Custom exception hierarchy for chess-specific errors.
+   
+   Classes:
+   - ChessException: Base exception for all chess errors
+   - InvalidMoveError: Raised when a move cannot be parsed or no piece can make it
+   - IllegalMoveError: Raised when a move would leave the king in check
+   - InvalidFENError: Raised when FEN notation is malformed
+   - GameOverError: Raised when trying to move after game has ended
+
+7. main.py
    
    Entry point for the application. Simply imports and calls play_game() from game.py.

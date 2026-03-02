@@ -1,6 +1,7 @@
 from board import Board
 from move_parser import parse_move, is_valid_move
 from pieces import King, Pawn
+from exceptions import InvalidMoveError, IllegalMoveError, GameOverError
 
 
 class Game:
@@ -18,13 +19,37 @@ class Game:
         else:
             self.current_turn = 'white'
     
-    def make_move(self, move_str):
+    def make_move(self, move_str, raise_exceptions=False):
+        """
+        Attempt to make a move.
+        
+        Args:
+            move_str: Algebraic notation move string
+            raise_exceptions: If True, raise exceptions instead of returning (False, msg)
+            
+        Returns:
+            (success: bool, message: str)
+            
+        Raises:
+            GameOverError: If the game is already over (when raise_exceptions=True)
+            InvalidMoveError: If move cannot be parsed (when raise_exceptions=True)
+            IllegalMoveError: If move would leave king in check (when raise_exceptions=True)
+        """
+        if self.game_over:
+            if raise_exceptions:
+                raise GameOverError()
+            return False, "Game is already over."
+        
         move = parse_move(move_str, self.current_turn, self.board)
         
         if move is None:
+            if raise_exceptions:
+                raise InvalidMoveError(move_str)
             return False, f"Invalid move: '{move_str}'. Could not parse or no piece can make that move."
         
         if not is_valid_move(move, self.current_turn, self.board):
+            if raise_exceptions:
+                raise IllegalMoveError(move_str)
             return False, f"Illegal move: '{move_str}'. This would leave your king in check."
         
         # Execute the move
@@ -115,6 +140,8 @@ def play_game():
     print("  - Castling: O-O (kingside), O-O-O (queenside)")
     print("  - Promotion: e8=Q")
     print("\nType 'quit' to exit, 'help' for commands")
+    print("Type 'fen <string>' to load a position")
+    print("Type 'savefen' to get the current position as FEN")
     print("=" * 50)
     
     while not game.game_over:
@@ -136,8 +163,10 @@ def play_game():
         
         if move_input.lower() == 'help':
             print("\nCommands:")
-            print("  quit   - Exit the game")
-            print("  help   - Show this help message")
+            print("  quit    - Exit the game")
+            print("  help    - Show this help message")
+            print("  fen <X> - Load position from FEN string X")
+            print("  savefen - Show current position as FEN")
             print("\nMove notation:")
             print("  e4     - Move pawn to e4")
             print("  Nf3    - Move knight to f3")
@@ -146,6 +175,25 @@ def play_game():
             print("  O-O    - Kingside castle")
             print("  O-O-O  - Queenside castle")
             print("  e8=Q   - Promote pawn to queen")
+            continue
+        
+        if move_input.lower().startswith('fen '):
+            fen_str = move_input[4:].strip()
+            from game_loader import GameLoader
+            from exceptions import InvalidFENError
+            try:
+                loader = GameLoader()
+                game = loader.load_fen(fen_str)
+                print(f"Position loaded successfully.")
+            except InvalidFENError as e:
+                print(f"Error: {e}")
+            continue
+        
+        if move_input.lower() == 'savefen':
+            from game_loader import GameLoader
+            loader = GameLoader()
+            fen = loader.save_fen(game)
+            print(f"FEN: {fen}")
             continue
         
         success, message = game.make_move(move_input)
