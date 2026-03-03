@@ -115,41 +115,6 @@ piece.get_possible_moves(pos, board)
 
 ---
 
-## Key Design Patterns
-
-### Template Method Pattern (Piece Hierarchy)
-
-```
-┌──────────────────────────────────────────┐
-│           Piece (Base Class)             │
-├──────────────────────────────────────────┤
-│ + symbol()          → abstract           │
-│ + get_possible_moves() → abstract        │
-│ # _is_valid_square()   → shared logic    │
-│ # _can_move_to()       → shared logic    │
-│ # _can_capture_on()    → shared logic    │
-└──────────────────────────────────────────┘
-            ▲
-            │ inherits
-    ┌───────┴───────┐
-    │               │
-┌───┴────┐      ┌───┴────┐
-│ Knight │      │ Bishop │  ... (and others)
-├────────┤      ├────────┤
-│symbol()│      │symbol()│  → Each implements
-│get_    │      │get_    │    their own
-│possible│      │possible│    movement logic
-│moves() │      │moves() │
-└────────┘      └────────┘
-```
-
-**Benefits:**
-- Common validation in base class
-- Each piece encapsulates its own rules
-- Easy to add new piece types
-
----
-
 ## Class Responsibilities
 
 | Class | Responsibility |

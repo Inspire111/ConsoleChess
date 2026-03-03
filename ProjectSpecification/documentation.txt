@@ -10,39 +10,6 @@ If you need help, type help.
 
 Technical documentation:
 
-
-Design Pattern: Template Method
-
-The project implements the Template Method design pattern in the piece hierarchy.
-
-What is the Template Method Pattern?
-   The Template Method pattern defines the skeleton of an algorithm in a base class,
-   allowing subclasses to override specific steps without changing the overall structure.
-
-Implementation in this project:
-   - The Piece base class (pieces.py) defines:
-     * Abstract methods: symbol() and get_possible_moves() that subclasses must implement
-     * Common helper methods: _is_valid_square(), _can_move_to(), _can_capture_on()
-   
-   - Each piece subclass (Pawn, Rook, Knight, Bishop, Queen, King) provides its own
-     implementation of symbol() and get_possible_moves() with piece-specific movement rules.
-   
-   - The Board and Game classes interact with pieces through the base Piece interface,
-     calling get_possible_moves() without knowing the concrete piece type. Python's
-     polymorphism ensures the correct subclass method is invoked.
-
-Benefits:
-   - New piece types can be added by creating a new subclass without modifying Board or Game
-   - Common validation logic is centralized in the base class
-   - Each piece encapsulates its own movement rules, following the Single Responsibility Principle
-
-Example flow:
-   1. Game calls board.get_piece(row, col) - returns a Piece reference
-   2. Game calls piece.get_possible_moves(pos, board) - polymorphism calls the correct subclass method
-   3. Knight.get_possible_moves() uses inherited _can_move_to() helper to validate L-shaped moves
-   4. Board doesn't need to know it's dealing with a Knight specifically
-
-
 Class diagrams:
 
                     Piece (base class)
